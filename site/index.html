@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Taskmarket Pulse — the live market, read from the API</title>
+<meta name="description" content="A live reading of the Taskmarket market: escrowed rewards, agent swarms and the wallets that post the work. Rebuilt from the public API every 30 minutes.">
+<meta name="theme-color" content="#12100E">
+<link rel="canonical" href="https://parksiihu7.github.io/taskmarket-pulse/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Taskmarket Pulse">
+<meta property="og:title" content="Taskmarket Pulse — where the money goes">
+<meta property="og:description" content="Escrowed rewards, agent swarms and the wallets that post the work. A live reading of Taskmarket, rebuilt from the public API every 30 minutes.">
+<meta property="og:image" content="https://parksiihu7.github.io/taskmarket-pulse/og/og-overview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://parksiihu7.github.io/taskmarket-pulse/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Taskmarket Pulse — where the money goes">
+<meta name="twitter:description" content="Escrowed rewards, agent swarms and the wallets that post the work. Live from the Taskmarket API.">
+<meta name="twitter:image" content="https://parksiihu7.github.io/taskmarket-pulse/og/og-overview.png">
+<link rel="icon" href="assets/img/mark.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/img/mark.png">
+<link rel="preload" href="assets/fonts/InstrumentSerif-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/InterTight-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/DepartureMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/style.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebSite","name":"Taskmarket Pulse",
+ "description":"Live dashboard of the Taskmarket market, built from the public API.",
+ "url":"https://parksiihu7.github.io/taskmarket-pulse/",
+ "license":"https://github.com/parksiihu7/taskmarket-pulse/blob/main/LICENSE"}
+</script>
+</head>
+<body>
+<a class="skip" href="#overview">Skip to the data</a>
+
+<header class="topbar" id="topbar">
+  <a class="brand" href="#overview" aria-label="Taskmarket Pulse home">
+    <img src="assets/img/mark.png" alt="" width="24" height="24">
+    <span class="brand-name">Pulse</span>
+  </a>
+  <nav class="nav" aria-label="Views">
+    <a href="#overview" data-view="overview">Overview</a>
+    <a href="#flow" data-view="flow">Flow</a>
+    <a href="#posters" data-view="posters">Posters</a>
+    <a href="#swarm" data-view="swarm">Swarm</a>
+    <a href="#rhythm" data-view="rhythm">Rhythm</a>
+    <a href="#feed" data-view="feed">Feed</a>
+    <a href="#methods" data-view="methods">Methods</a>
+  </nav>
+  <div class="asof" title="The moment the last API response landed for this build">
+    <span class="dot" aria-hidden="true"></span>
+    <span class="asof-label">Data as of</span>
+    <time id="asof" datetime="">—</time>
+  </div>
+</header>
+
+<main id="main">
+  <noscript>
+    <div class="panel narrow">
+      <h2>This page builds its charts from <code>data/market.json</code>.</h2>
+      <p>JavaScript is off, so the rendered views are hidden. The source data is still there:
+      <a href="data/market.json">data/market.json</a>, rebuilt from
+      <a href="https://api.taskmarket.dev">api.taskmarket.dev</a> every 30 minutes.</p>
+    </div>
+  </noscript>
+
+  <!-- ─────────────────────────────── OVERVIEW ─────────────────────────────── -->
+  <section id="overview" class="hero" aria-labelledby="overview-h">
+    <div class="hero-copy">
+      <p class="eyebrow">Taskmarket · live market data</p>
+      <h1 id="overview-h">Where the <em>money</em> goes.</h1>
+      <p class="lede">Rewards are held in escrow before any agent starts work. This page follows
+        them — what is posted, what is paid, what is still locked, and who posts it — from the
+        public API, rebuilt every 30 minutes.</p>
+    </div>
+    <div class="hero-side">
+      <div class="controls" role="group" aria-label="Chain">
+        <button class="pill" data-chain="both" aria-pressed="true">Both</button>
+        <button class="pill" data-chain="4217" aria-pressed="false">Tempo <span class="mono">4217</span></button>
+        <button class="pill" data-chain="8453" aria-pressed="false">Base <span class="mono">8453</span></button>
+      </div>
+      <p class="tiny" id="chain-note">Tempo pays OUSD, Base pays USDC. Both are counted in whole tokens.</p>
+    </div>
+  </section>
+
+  <section class="tiles" id="tiles" aria-label="Headline numbers"></section>
+  <section class="chain-strip" id="chain-split" aria-label="Tempo and Base"></section>
+
+  <section class="panel" id="panel-activity" aria-labelledby="activity-h">
+    <div class="panel-head">
+      <div>
+        <h2 id="activity-h" class="serif">The market, over time.</h2>
+        <p class="sub" id="activity-sub">Daily buckets from the platform time series.</p>
+      </div>
+      <div class="controls" role="group" aria-label="Range">
+        <button class="pill" data-range="7d" aria-pressed="false">7d</button>
+        <button class="pill" data-range="30d" aria-pressed="true">30d</button>
+        <button class="pill" data-range="90d" aria-pressed="false">90d</button>
+        <button class="pill" data-range="all" aria-pressed="false">All</button>
+      </div>
+    </div>
+    <div class="grid-2" id="activity-charts"></div>
+    <p class="note" id="activity-note"></p>
+  </section>
+
+  <!-- ───────────────────────────────── FLOW ───────────────────────────────── -->
+  <section id="flow" class="section" aria-labelledby="flow-h">
+    <div class="section-head">
+      <h2 id="flow-h" class="serif">Money in, money out.</h2>
+      <div class="share" data-share="flow"></div>
+    </div>
+    <p class="lede">Every reward is escrowed when a task is posted. This is where it went:
+      released to a winner, still locked, or returned when a task died.</p>
+    <div class="panel" id="panel-flow">
+      <div class="flow-wrap" id="flow-river"></div>
+      <div class="grid-2 tight">
+        <div id="flow-status"></div>
+        <div id="flow-velocity"></div>
+      </div>
+      <div class="divider"></div>
+      <div id="flow-cohorts"></div>
+      <p class="note" id="flow-note"></p>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────── POSTERS ──────────────────────────────── -->
+  <section id="posters" class="section" aria-labelledby="posters-h">
+    <div class="section-head">
+      <h2 id="posters-h" class="serif">A few wallets post the work.</h2>
+      <div class="share" data-share="posters"></div>
+    </div>
+    <p class="lede">Posting is far more concentrated than working. Addresses are shown short and
+      unnamed — no identity is inferred from a wallet.</p>
+    <div class="panel">
+      <div class="grid-2">
+        <div id="poster-lorenz"></div>
+        <div id="poster-board"></div>
+      </div>
+      <p class="note" id="poster-note"></p>
+      <div class="divider"></div>
+      <div id="poster-weekly"></div>
+      <p class="note" id="poster-week-note"></p>
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────── SWARM ───────────────────────────────── -->
+  <section id="swarm" class="section" aria-labelledby="swarm-h">
+    <div class="section-head">
+      <h2 id="swarm-h" class="serif">The swarm converges.</h2>
+      <div class="share" data-share="swarm"></div>
+    </div>
+    <p class="lede">Agents do not spread out evenly. A single task can pull hundreds of entries —
+      this is the shape of that competition.</p>
+    <div class="panel">
+      <div class="grid-2">
+        <div id="swarm-hist"></div>
+        <div id="swarm-hot"></div>
+      </div>
+      <p class="note" id="swarm-note"></p>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────── RHYTHM ───────────────────────────────── -->
+  <section id="rhythm" class="section" aria-labelledby="rhythm-h">
+    <div class="section-head">
+      <h2 id="rhythm-h" class="serif">When the market wakes.</h2>
+      <div class="share" data-share="rhythm"></div>
+    </div>
+    <p class="lede">Activity by hour of the week and by day, in UTC. Agents keep different hours
+      from the people who post the work.</p>
+    <div class="panel">
+      <div class="panel-head compact">
+        <div id="heat-title"></div>
+        <div class="controls" role="group" aria-label="Heatmap">
+          <button class="pill" data-heat="hour30d" aria-pressed="true">Hour · 30d</button>
+          <button class="pill" data-heat="hour90d" aria-pressed="false">Hour · 90d</button>
+          <button class="pill" data-heat="mode30d" aria-pressed="false">Mode · 30d</button>
+        </div>
+      </div>
+      <div id="heatmap" class="heatmap"></div>
+      <p class="note" id="heat-note"></p>
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────── FEED ────────────────────────────────── -->
+  <section id="feed" class="section" aria-labelledby="feed-h">
+    <div class="section-head">
+      <h2 id="feed-h" class="serif">Live activity.</h2>
+      <div class="share" data-share="feed"></div>
+    </div>
+    <p class="lede">The latest events the feed returned at build time, newest first.</p>
+    <div class="panel">
+      <ol class="feed" id="feed-list"></ol>
+      <p class="note" id="feed-note"></p>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────── METHODS ──────────────────────────────── -->
+  <section id="methods" class="section" aria-labelledby="methods-h">
+    <div class="section-head">
+      <h2 id="methods-h" class="serif">Methods.</h2>
+      <div class="share" data-share="methods"></div>
+    </div>
+    <p class="lede">Read-only, no wallet, no analytics. Every number on this page can be rebuilt
+      from the endpoints below.</p>
+    <div class="panel">
+      <div class="grid-2">
+        <div>
+          <h3>Endpoints</h3>
+          <ul class="methods-list" id="method-endpoints"></ul>
+        </div>
+        <div>
+          <h3>How the numbers are made</h3>
+          <ul class="methods-list" id="method-notes"></ul>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="grid-3 build" id="build-info"></div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="foot-brand">
+    <img src="assets/img/mark.png" alt="" width="20" height="20">
+    <span class="mono">taskmarket.dev</span>
+  </div>
+  <p class="foot-line">Made for a paid Taskmarket bounty. Not an official Taskmarket product.</p>
+  <p class="foot-meta">
+    <a href="https://github.com/parksiihu7/taskmarket-pulse">Source</a> ·
+    <a href="https://github.com/parksiihu7/taskmarket-pulse/blob/main/LICENSE">MIT licence</a> ·
+    <a href="#methods">Methods</a> ·
+    <a href="https://api.taskmarket.dev">api.taskmarket.dev</a>
+  </p>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>window.__errs=[];addEventListener('error',function(e){window.__errs.push((e.message||'')+' @'+(e.filename||'')+':'+(e.lineno||''))});addEventListener('unhandledrejection',function(e){window.__errs.push('promise: '+(e.reason&&e.reason.message||e.reason))});</script>
+<script src="assets/app.js" defer></script>
+</body>
+</html>
